@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Sync — Smart Multi-Campus Management System</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js for data visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-logo">
+                    <div class="logo-icon">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div class="logo-text">
+                        <span class="brand-title">CAMPUS<span class="accent-text">SYNC</span></span>
+                        <span class="brand-subtitle">Smart Multi-Campus System</span>
+                    </div>
+                </div>
+                <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Sidebar">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Campus Mode Badge in Sidebar -->
+            <div class="sidebar-scope-card">
+                <div class="scope-icon"><i class="fa-solid fa-network-wired"></i></div>
+                <div class="scope-info">
+                    <span class="scope-label">ACTIVE SCOPE</span>
+                    <span class="scope-val" id="sidebarActiveCampusName">All Campuses</span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">MAIN MENU</div>
+                <a href="#dashboard" class="nav-item active" data-page="dashboard">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Central Dashboard</span>
+                </a>
+                <a href="#students" class="nav-item" data-page="students">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>Students & Admissions</span>
+                </a>
+                <a href="#scholarships" class="nav-item" data-page="scholarships">
+                    <i class="fa-solid fa-award"></i>
+                    <span>Scholarships</span>
+                </a>
+                <a href="#examinations" class="nav-item" data-page="examinations">
+                    <i class="fa-solid fa-file-pen"></i>
+                    <span>Examinations</span>
+                </a>
+                <a href="#fees" class="nav-item" data-page="fees">
+                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                    <span>Fee Management</span>
+                </a>
+                <a href="#attendance" class="nav-item" data-page="attendance">
+                    <i class="fa-solid fa-clipboard-user"></i>
+                    <span>Attendance & Alerts</span>
+                </a>
+                <a href="#hostel" class="nav-item" data-page="hostel">
+                    <i class="fa-solid fa-hotel"></i>
+                    <span>Hostel Allocation</span>
+                </a>
+
+                <div class="nav-section-title">DATA & TOOLS</div>
+                <a href="#import" class="nav-item" data-page="import">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span>Excel & CSV Import</span>
+                </a>
+                <a href="#reports" class="nav-item" data-page="reports">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>Consolidated Reports</span>
+                </a>
+                <a href="#settings" class="nav-item" data-page="settings">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Settings & Audit</span>
+                </a>
+            </nav>
+
+            <!-- Six Official Campuses Quick Switcher in Sidebar -->
+            <div class="sidebar-campuses-list">
+                <div class="nav-section-title">THE SIX CAMPUSES</div>
+                <ul class="campus-pills-list" id="sidebarCampusPills">
+                    <!-- Dynamic Campus list -->
+                </ul>
+            </div>
+
+            <!-- User Profile Card -->
+            <div class="sidebar-footer">
+                <div class="user-profile-badge">
+                    <div class="avatar" id="userAvatar">CS</div>
+                    <div class="user-meta">
+                        <span class="user-name" id="userNameLabel">Campus Supervisor</span>
+                        <span class="user-role-tag" id="userRoleTag">Supervisor Mode</span>
+                    </div>
+                    <button class="role-switch-btn" id="roleSwitchBtn" title="Switch User Role">
+                        <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="main-wrapper">
+            <!-- TOP NAVBAR -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="mobile-menu-trigger" id="mobileMenuBtn">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <!-- Global Campus Selector Dropdown -->
+                    <div class="campus-selector-wrapper">
+                        <label for="globalCampusSelect" class="selector-label">
+                            <i class="fa-solid fa-building-columns"></i>
+                        </label>
+                        <select id="globalCampusSelect" class="global-campus-dropdown">
+                            <option value="ALL">All Six Campuses (Consolidated View)</option>
+                            <option value="1">1. Medical Campus</option>
+                            <option value="2">2. Polytechnic Campus</option>
+                            <option value="3">3. Diploma Campus</option>
+                            <option value="4">4. Engineering Campus</option>
+                            <option value="5">5. B.Tech Campus</option>
+                            <option value="6">6. PUC Campus</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="topbar-center">
+                    <div class="global-search-box">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="globalSearchInput" placeholder="Quick search student ID, name, email or receipt..." autocomplete="off">
+                        <button class="search-clear-btn" id="globalSearchClear" style="display:none;"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <!-- Academic Year Badge -->
+                    <div class="session-badge">
+                        <span class="session-dot"></span>
+                        <span class="session-text">AY 2025-26</span>
+                    </div>
+
+                    <!-- Notifications Dropdown -->
+                    <div class="action-dropdown-wrapper">
+                        <button class="icon-action-btn" id="notificationsBtn" title="Notifications & Alerts">
+                            <i class="fa-solid fa-bell"></i>
+                            <span class="badge-count" id="notificationBadge">3</span>
+                        </button>
+                        <div class="dropdown-popover" id="notificationsPopover">
+                            <div class="popover-header">
+                                <h6>System Alerts & Notifications</h6>
+                                <span class="badge-light" id="popoverAlertCount">3 Active</span>
+                            </div>
+                            <div class="popover-body" id="notificationsList">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Action: New Admission -->
+                    <button class="btn btn-primary btn-sm" id="quickAdmissionBtn">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>New Admission</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- SUB-HEADER / BANNER -->
+            <div class="context-banner" id="contextBanner">
+                <div class="banner-content">
+                    <div class="banner-title-row">
+                        <h1 class="page-main-heading" id="currentPageTitle">Central Dashboard</h1>
+                        <span class="campus-context-tag" id="currentCampusBadge">Consolidated (6 Campuses)</span>
+                    </div>
+                    <p class="page-subtitle" id="currentPageSubtitle">Real-time institutional metrics, student distribution, fee recovery, and attendance monitoring.</p>
+                </div>
+                <div class="banner-actions" id="bannerActions">
+                    <button class="btn btn-outline-white" id="refreshDataBtn">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Refresh Data</span>
+                    </button>
+                    <button class="btn btn-white" id="exportConsolidatedReportBtn">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Export CSV</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PAGE CONTAINERS (SPA) -->
+            <main class="content-container">
+
+                <!-- 1. DASHBOARD PAGE -->
+                <section class="page-view active" id="page-dashboard">
+                    <!-- KPI CARDS -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card card-students">
+                            <div class="kpi-header">
+                                <span class="kpi-title">TOTAL STUDENTS</span>
+                                <div class="kpi-icon-pill icon-blue"><i class="fa-solid fa-users"></i></div>
+                            </div>
+                            <div class="kpi-body">
+                                <h2 class="kpi-value" id="kpiTotalStudents">--</h2>
+                                <div class="kpi-trend">
+                                    <span class="trend-badge positive"><i class="fa-solid fa-arrow-trend-up"></i> Verified</span>
+                                    <span class="kpi-hint">Across 6 Campuses</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card card-assessed">
+                            <div class="kpi-header">
+                                <span class="kpi-title">FEES ASSESSED</span>
+                                <div class="kpi-icon-pill icon-purple"><i class="fa-solid fa-receipt"></i></div>
+                            </div>
+                            <div class="kpi-body">
+                                <h2 class="kpi-value" id="kpiTotalAssessed">₹0</h2>
+                                <div class="kpi-trend">
+                                    <span class="trend-sub">Concessions: <strong id="kpiTotalConcession">₹0</strong></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card card-collected">
+                            <div class="kpi-header">
+                                <span class="kpi-title">FEES COLLECTED</span>
+                                <div class="kpi-icon-pill icon-green"><i class="fa-solid fa-circle-check"></i></div>
+                            </div>
+                            <div class="kpi-body">
+                                <h2 class="kpi-value" id="kpiTotalCollected">₹0</h2>
+                                <div class="kpi-trend">
+                                    <span class="trend-badge positive" id="kpiCollectionRate"><i class="fa-solid fa-percent"></i> 0%</span>
+                                    <span class="kpi-hint">Recovery Rate</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card card-outstanding">
+                            <div class="kpi-header">
+                                <span class="kpi-title">OUTSTANDING BALANCE</span>
+                                <div class="kpi-icon-pill icon-red"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                            </div>
+                            <div class="kpi-body">
+                                <h2 class="kpi-value" id="kpiTotalOutstanding">₹0</h2>
+                                <div class="kpi-trend">
+                                    <span class="trend-badge warning"><i class="fa-solid fa-triangle-exclamation"></i> Action Required</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card card-attendance">
+                            <div class="kpi-header">
+                                <span class="kpi-title">AVG ATTENDANCE</span>
+                                <div class="kpi-icon-pill icon-teal"><i class="fa-solid fa-calendar-check"></i></div>
+                            </div>
+                            <div class="kpi-body">
+                                <h2 class="kpi-value" id="kpiAvgAttendance">--%</h2>
+                                <div class="kpi-trend">
+                                    <span class="trend-badge danger" id="kpiLowAttCountBadge"><i class="fa-solid fa-user-xmark"></i> 0 Below 75%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card card-hostel">
+                            <div class="kpi-header">
+                                <span class="kpi-title">HOSTEL OCCUPANCY</span>
+                                <div class="kpi-icon-pill icon-amber"><i class="fa-solid fa-bed"></i></div>
+                            </div>
+                            <div class="kpi-body">
+                                <h2 class="kpi-value" id="kpiHostelOccupancy">--%</h2>
+                                <div class="kpi-trend">
+                                    <span class="trend-sub"><strong id="kpiHostelBedsMeta">0 / 0 Beds</strong> Occupied</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CHARTS ROW -->
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="card-title-row">
+                                <div>
+                                    <h3 class="chart-title">Student Enrollment by Campus</h3>
+                                    <p class="chart-desc">Breakdown of students enrolled across the six campuses</p>
+                                </div>
+                                <span class="badge-pill">6 Campuses</span>
+                            </div>
+                            <div class="chart-container" style="position: relative; height: 280px;">
+                                <canvas id="chartStudentDistribution"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="card-title-row">
+                                <div>
+                                    <h3 class="chart-title">Fee Recovery vs Outstanding</h3>
+                                    <p class="chart-desc">Comparison of collected fees against pending balances (₹)</p>
+                                </div>
+                                <span class="badge-pill">Finance</span>
+                            </div>
+                            <div class="chart-container" style="position: relative; height: 280px;">
+                                <canvas id="chartFeeRecovery"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECOND ROW CHARTS & LISTS -->
+                    <div class="dashboard-split-grid">
+                        <!-- Six Campuses Master Snapshot Table -->
+                        <div class="panel-card flex-2">
+                            <div class="panel-header">
+                                <div class="panel-title-group">
+                                    <h3>Institutional Campus Matrix</h3>
+                                    <p>Comparative summary of students, fees, attendance, and hostel status per campus</p>
+                                </div>
+                                <button class="btn btn-sm btn-outline" id="viewDetailedReportsBtn">View Detailed Report</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="campusMatrixTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Campus Name</th>
+                                            <th>Code</th>
+                                            <th>Students</th>
+                                            <th>Assessed (₹)</th>
+                                            <th>Collected (₹)</th>
+                                            <th>Pending (₹)</th>
+                                            <th>Hostel</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="campusMatrixTbody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Students Requiring Attention -->
+                        <div class="panel-card flex-1">
+                            <div class="panel-header">
+                                <div class="panel-title-group">
+                                    <h3><i class="fa-solid fa-triangle-exclamation text-warning"></i> Attention Needed</h3>
+                                    <p>Students with low attendance or critical pending fees</p>
+                                </div>
+                            </div>
+                            <div class="attention-list-wrapper" id="dashboardAttentionList">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RECENT AUDIT LOGS WIDGET -->
+                    <div class="panel-card mt-4">
+                        <div class="panel-header">
+                            <div class="panel-title-group">
+                                <h3><i class="fa-solid fa-shield-halved text-primary"></i> Recent Audit & Operational Events</h3>
+                                <p>Tamper-evident logs of fee entries, campus transfers, and admissions</p>
+                            </div>
+                            <span class="badge-pill"><i class="fa-solid fa-lock"></i> Parameterized SQLite</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table" id="dashboardAuditTable">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>User Role</th>
+                                        <th>Action</th>
+                                        <th>Campus</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboardAuditTbody">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. STUDENTS & ADMISSIONS PAGE -->
+                <section class="page-view" id="page-students">
+                    <div class="panel-card">
+                        <!-- Filters and Action Toolbar -->
+                        <div class="table-toolbar">
+                            <div class="toolbar-search">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="studentSearchFilter" placeholder="Search by student ID, name, email...">
+                            </div>
+                            <div class="toolbar-filters">
+                                <select id="studentCampusFilter" class="form-select-sm">
+                                    <option value="">All Campuses</option>
+                                    <option value="1">Medical Campus</option>
+                                    <option value="2">Polytechnic Campus</option>
+                                    <option value="3">Diploma Campus</option>
+                                    <option value="4">Engineering Campus</option>
+                                    <option value="5">B.Tech Campus</option>
+                                    <option value="6">PUC Campus</option>
+                                </select>
+                                <select id="studentStatusFilter" class="form-select-sm">
+                                    <option value="">All Statuses</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Transferred">Transferred</option>
+                                    <option value="Graduated">Graduated</option>
+                                </select>
+                                <select id="studentFeeStatusFilter" class="form-select-sm">
+                                    <option value="">All Fee Statuses</option>
+                                    <option value="Paid">Paid in Full</option>
+                                    <option value="Partially Paid">Partially Paid</option>
+                                    <option value="Pending">Pending</option>
+                                </select>
+                                <button class="btn btn-outline btn-sm" id="resetStudentFiltersBtn"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+                            </div>
+                            <div class="toolbar-actions">
+                                <button class="btn btn-primary" id="openNewStudentModalBtn">
+                                    <i class="fa-solid fa-user-plus"></i> New Admission
+                                </button>
+                                <button class="btn btn-outline" id="exportStudentsCsvBtn">
+                                    <i class="fa-solid fa-file-export"></i> Export CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Students Table -->
+                        <div class="table-responsive">
+                            <table class="data-table" id="studentsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Student Name</th>
+                                        <th>Campus</th>
+                                        <th>Course</th>
+                                        <th>Total Fee</th>
+                                        <th>Pending Balance</th>
+                                        <th>Attendance</th>
+                                        <th>Hostel</th>
+                                        <th>Status</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentsTbody">
+                                    <!-- Loaded dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-pagination">
+                            <span class="pagination-info" id="studentCountLabel">Showing 0 students</span>
+                            <div>
+                                <button class="btn btn-outline btn-sm" id="studentPreviousPageBtn" disabled>Previous</button>
+                                <button class="btn btn-outline btn-sm" id="studentNextPageBtn" disabled>Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SCHOLARSHIP MANAGEMENT PAGE -->
+                <section class="page-view" id="page-scholarships">
+                    <div class="panel-card mb-4">
+                        <div class="fee-kpis-bar">
+                            <div class="fee-kpi-item"><span class="label">Total Scholarships</span><h3 id="scholarshipTotalCount">0</h3></div>
+                            <div class="fee-kpi-item"><span class="label">Approved Applications</span><h3 id="scholarshipApprovedCount" class="text-success">0</h3></div>
+                            <div class="fee-kpi-item"><span class="label">Pending Applications</span><h3 id="scholarshipPendingCount" class="text-amber">0</h3></div>
+                            <div class="fee-kpi-item"><span class="label">Scholarship Amounts</span><h3 id="scholarshipAmountTotal">₹0</h3></div>
+                        </div>
+                    </div>
+
+                    <div class="panel-card mb-4">
+                        <div class="panel-header"><div class="panel-title-group"><h3 id="scholarshipFormTitle">Add Scholarship Application</h3><p>Record eligibility, application progress, and approval status for a student.</p></div></div>
+                        <form id="scholarshipForm">
+                            <input type="hidden" id="scholarshipRecordId">
+                            <div class="form-row">
+                                <div class="form-group flex-1"><label class="form-label required" for="scholarshipName">Scholarship Name</label><input id="scholarshipName" class="form-input" required></div>
+                                <div class="form-group flex-1"><label class="form-label required" for="scholarshipStudentId">Student ID</label><input id="scholarshipStudentId" class="form-input" placeholder="e.g. MED001" required></div>
+                                <div class="form-group flex-1"><label class="form-label required" for="scholarshipCampus">Campus</label><select id="scholarshipCampus" class="form-select" required><option value="">Select Campus</option><option value="1">Medical Campus</option><option value="2">Polytechnic Campus</option><option value="3">Diploma Campus</option><option value="4">Engineering Campus</option><option value="5">B.Tech Campus</option><option value="6">PUC Campus</option></select></div>
+                                <div class="form-group flex-1"><label class="form-label required" for="scholarshipAmount">Amount (₹)</label><input id="scholarshipAmount" type="number" min="0" step="0.01" class="form-input" required></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group flex-2"><label class="form-label required" for="scholarshipEligibility">Eligibility</label><input id="scholarshipEligibility" class="form-input" required></div>
+                                <div class="form-group flex-1"><label class="form-label" for="scholarshipApplicationStatus">Application Status</label><select id="scholarshipApplicationStatus" class="form-select"><option>Pending</option><option>Submitted</option><option>Under Review</option><option>Withdrawn</option></select></div>
+                                <div class="form-group flex-1"><label class="form-label" for="scholarshipApprovalStatus">Approval Status</label><select id="scholarshipApprovalStatus" class="form-select"><option>Pending</option><option>Approved</option><option>Rejected</option></select></div>
+                            </div>
+                            <div class="toolbar-actions"><button type="submit" class="btn btn-primary" id="saveScholarshipBtn">Save Scholarship</button><button type="button" class="btn btn-outline" id="cancelScholarshipEditBtn" style="display:none;">Cancel Edit</button></div>
+                        </form>
+                    </div>
+
+                    <div class="panel-card">
+                        <div class="table-toolbar">
+                            <div class="toolbar-search"><i class="fa-solid fa-magnifying-glass"></i><input id="scholarshipSearch" placeholder="Search scholarship, student ID, or name"></div>
+                            <div class="toolbar-filters">
+                                <select id="scholarshipCampusFilter" class="form-select-sm"><option value="">All Campuses</option><option value="1">Medical Campus</option><option value="2">Polytechnic Campus</option><option value="3">Diploma Campus</option><option value="4">Engineering Campus</option><option value="5">B.Tech Campus</option><option value="6">PUC Campus</option></select>
+                                <select id="scholarshipApplicationFilter" class="form-select-sm"><option value="">All Application Statuses</option><option>Pending</option><option>Submitted</option><option>Under Review</option><option>Withdrawn</option></select>
+                                <select id="scholarshipApprovalFilter" class="form-select-sm"><option value="">All Approval Statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option></select>
+                            </div>
+                        </div>
+                        <div class="table-responsive"><table class="data-table"><thead><tr><th>Scholarship</th><th>Student</th><th>Campus</th><th>Amount</th><th>Eligibility</th><th>Application</th><th>Approval</th><th>Action</th></tr></thead><tbody id="scholarshipTbody"></tbody></table></div>
+                    </div>
+                </section>
+
+                <!-- EXAMINATION MANAGEMENT PAGE -->
+                <section class="page-view" id="page-examinations">
+                    <div class="panel-card mb-4">
+                        <div class="fee-kpis-bar">
+                            <div class="fee-kpi-item"><span class="label">Upcoming Examinations</span><h3 id="upcomingExamCount">0</h3></div>
+                            <div class="fee-kpi-item"><span class="label">Completed Examinations</span><h3 id="completedExamCount" class="text-success">0</h3></div>
+                        </div>
+                    </div>
+                    <div class="panel-card mb-4">
+                        <div class="panel-header"><div class="panel-title-group"><h3 id="examFormTitle">Schedule Examination</h3><p>Set the campus, course, subject, date, time, type, and examination status.</p></div></div>
+                        <form id="examinationForm">
+                            <input type="hidden" id="examRecordId">
+                            <div class="form-row">
+                                <div class="form-group flex-1"><label class="form-label required" for="examCampus">Campus</label><select id="examCampus" class="form-select" required><option value="">Select Campus</option><option value="1">Medical Campus</option><option value="2">Polytechnic Campus</option><option value="3">Diploma Campus</option><option value="4">Engineering Campus</option><option value="5">B.Tech Campus</option><option value="6">PUC Campus</option></select></div>
+                                <div class="form-group flex-1"><label class="form-label required" for="examCourse">Course</label><input id="examCourse" class="form-input" required></div>
+                                <div class="form-group flex-1"><label class="form-label required" for="examSubjectName">Subject Name</label><input id="examSubjectName" class="form-input" required></div>
+                                <div class="form-group flex-1"><label class="form-label required" for="examSubjectCode">Subject Code</label><input id="examSubjectCode" class="form-input" required></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group flex-1"><label class="form-label required" for="examDate">Exam Date</label><input id="examDate" type="date" class="form-input" required></div>
+                                <div class="form-group flex-1"><label class="form-label required" for="examStartTime">Start Time</label><input id="examStartTime" type="time" class="form-input" required></div>
+                                <div class="form-group flex-1"><label class="form-label required" for="examEndTime">End Time</label><input id="examEndTime" type="time" class="form-input" required></div>
+                                <div class="form-group flex-1"><label class="form-label required" for="examType">Exam Type</label><input id="examType" class="form-input" placeholder="Mid-Term, End-Semester..." required></div>
+                                <div class="form-group flex-1"><label class="form-label" for="examStatus">Status</label><select id="examStatus" class="form-select"><option>Scheduled</option><option>Completed</option><option>Cancelled</option></select></div>
+                            </div>
+                            <div class="toolbar-actions"><button type="submit" class="btn btn-primary" id="saveExamBtn">Schedule Examination</button><button type="button" class="btn btn-outline" id="cancelExamEditBtn" style="display:none;">Cancel Edit</button></div>
+                        </form>
+                    </div>
+                    <div class="panel-card">
+                        <div class="table-toolbar">
+                            <div class="toolbar-search"><i class="fa-solid fa-magnifying-glass"></i><input id="examSearch" placeholder="Search course, subject, code, or campus"></div>
+                            <div class="toolbar-filters">
+                                <select id="examCampusFilter" class="form-select-sm"><option value="">All Campuses</option><option value="1">Medical Campus</option><option value="2">Polytechnic Campus</option><option value="3">Diploma Campus</option><option value="4">Engineering Campus</option><option value="5">B.Tech Campus</option><option value="6">PUC Campus</option></select>
+                                <select id="examStatusFilter" class="form-select-sm"><option value="">All Examination Statuses</option><option>Scheduled</option><option>Completed</option><option>Cancelled</option></select>
+                            </div>
+                        </div>
+                        <div class="table-responsive"><table class="data-table"><thead><tr><th>Campus</th><th>Course</th><th>Subject</th><th>Code</th><th>Date</th><th>Start</th><th>End</th><th>Type</th><th>Status</th><th>Action</th></tr></thead><tbody id="examinationTbody"></tbody></table></div>
+                    </div>
+                </section>
+
+                <!-- 3. FEE MANAGEMENT PAGE -->
+                <section class="page-view" id="page-fees">
+                    <div class="panel-card mb-4">
+                        <div class="fee-kpis-bar">
+                            <div class="fee-kpi-item">
+                                <span class="label">Total Assessed Fees</span>
+                                <h3 id="feePageAssessed">₹0</h3>
+                            </div>
+                            <div class="fee-kpi-item">
+                                <span class="label">Concessions / Scholarships</span>
+                                <h3 id="feePageConcessions" class="text-purple">₹0</h3>
+                            </div>
+                            <div class="fee-kpi-item">
+                                <span class="label">Total Fees Collected</span>
+                                <h3 id="feePageCollected" class="text-success">₹0</h3>
+                            </div>
+                            <div class="fee-kpi-item">
+                                <span class="label">Outstanding Pending</span>
+                                <h3 id="feePagePending" class="text-danger">₹0</h3>
+                            </div>
+                            <div class="fee-kpi-item action-box">
+                                <button class="btn btn-primary" id="openPaymentModalBtn">
+                                    <i class="fa-solid fa-receipt"></i> Record Fee Payment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-card">
+                        <div class="table-toolbar">
+                            <div class="toolbar-search">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="feeStudentSearch" placeholder="Search fee records by student ID, name...">
+                            </div>
+                            <div class="toolbar-filters">
+                                <select id="feeCampusFilter" class="form-select-sm">
+                                    <option value="">All Campuses</option>
+                                    <option value="1">Medical Campus</option>
+                                    <option value="2">Polytechnic Campus</option>
+                                    <option value="3">Diploma Campus</option>
+                                    <option value="4">Engineering Campus</option>
+                                    <option value="5">B.Tech Campus</option>
+                                    <option value="6">PUC Campus</option>
+                                </select>
+                                <select id="feeStatusQuickFilter" class="form-select-sm">
+                                    <option value="">All Balance Statuses</option>
+                                    <option value="Pending">Pending Only</option>
+                                    <option value="Partially Paid">Partially Paid</option>
+                                    <option value="Paid">Fully Paid</option>
+                                </select>
+                                <button class="btn btn-outline btn-sm" id="exportFeesReportBtn"><i class="fa-solid fa-file-csv"></i> Export Receipts</button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="data-table" id="feeManagementTable">
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Name</th>
+                                        <th>Campus</th>
+                                        <th>Total Course Fee</th>
+                                        <th>Concession</th>
+                                        <th>Net Payable</th>
+                                        <th>Amount Paid</th>
+                                        <th>Pending Balance</th>
+                                        <th>Fee Status</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="feeManagementTbody">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. ATTENDANCE & ALERTS PAGE -->
+                <section class="page-view" id="page-attendance">
+                    <div class="panel-card mb-4">
+                        <div class="attendance-toolbar-row">
+                            <div class="date-campus-picker">
+                                <div class="form-group-inline">
+                                    <label><i class="fa-solid fa-calendar-day"></i> Attendance Date:</label>
+                                    <input type="date" id="attendanceDatePicker" class="form-input">
+                                </div>
+                                <div class="form-group-inline">
+                                    <label><i class="fa-solid fa-building-columns"></i> Campus:</label>
+                                    <select id="attendanceCampusFilter" class="form-select">
+                                        <option value="">All Campuses</option>
+                                        <option value="1">Medical Campus</option>
+                                        <option value="2">Polytechnic Campus</option>
+                                        <option value="3">Diploma Campus</option>
+                                        <option value="4">Engineering Campus</option>
+                                        <option value="5">B.Tech Campus</option>
+                                        <option value="6">PUC Campus</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="att-actions">
+                                <button class="btn btn-outline" id="markAllPresentBtn"><i class="fa-solid fa-check-double"></i> Mark All Present</button>
+                                <button class="btn btn-primary" id="saveBulkAttendanceBtn"><i class="fa-solid fa-floppy-disk"></i> Save Attendance</button>
+                                <button class="btn btn-outline" id="exportAttendanceCsvBtn"><i class="fa-solid fa-file-csv"></i> Export Attendance</button>
+                            </div>
+                        </div>
+                        <div class="attendance-summary-stats" id="attendanceSummaryRow">
+                            <span class="stat-tag"><i class="fa-solid fa-users"></i> Total: <strong id="attStatTotal">0</strong></span>
+                            <span class="stat-tag text-success"><i class="fa-solid fa-user-check"></i> Present: <strong id="attStatPresent">0</strong></span>
+                            <span class="stat-tag text-danger"><i class="fa-solid fa-user-xmark"></i> Absent: <strong id="attStatAbsent">0</strong></span>
+                            <span class="stat-tag text-amber"><i class="fa-solid fa-circle-question"></i> Not Marked: <strong id="attStatNotMarked">0</strong></span>
+                            <span class="stat-tag text-purple"><i class="fa-solid fa-shield-virus"></i> Threshold Alert: <strong id="attThresholdDisplay">75%</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="panel-card">
+                        <div class="table-responsive">
+                            <table class="data-table" id="attendanceGridTable">
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Full Name</th>
+                                        <th>Campus</th>
+                                        <th>Course</th>
+                                        <th>Cumulative Attendance</th>
+                                        <th>Threshold Status</th>
+                                        <th>Status on Selected Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendanceGridTbody">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. HOSTEL ALLOCATION PAGE -->
+                <section class="page-view" id="page-hostel">
+                    <div class="panel-card mb-4">
+                        <div class="hostel-header-row">
+                            <div>
+                                <h3>Residential Facility & Room Allocation</h3>
+                                <p>Manage room capacity, bed occupancy, and student allocations per campus. <em>(Note: PUC Campus is non-residential by institutional charter).</em></p>
+                            </div>
+                            <div class="hostel-header-btns">
+                                <button class="btn btn-outline" id="openAddRoomModalBtn"><i class="fa-solid fa-plus"></i> Add New Room</button>
+                                <button class="btn btn-primary" id="openAllocateHostelModalBtn"><i class="fa-solid fa-key"></i> Allocate Room to Student</button>
+                                <button class="btn btn-outline" id="exportHostelReportBtn"><i class="fa-solid fa-file-csv"></i> Export Hostel Data</button>
+                            </div>
+                        </div>
+                        <div class="hostel-kpi-summary">
+                            <div class="hkpi-card">
+                                <span>Total Rooms</span>
+                                <strong id="hostelTotalRooms">0</strong>
+                            </div>
+                            <div class="hkpi-card">
+                                <span>Total Capacity</span>
+                                <strong id="hostelTotalBeds">0 Beds</strong>
+                            </div>
+                            <div class="hkpi-card">
+                                <span>Occupied Beds</span>
+                                <strong id="hostelOccupiedBeds" class="text-amber">0</strong>
+                            </div>
+                            <div class="hkpi-card">
+                                <span>Available Vacancies</span>
+                                <strong id="hostelAvailableBeds" class="text-success">0</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campus Hostel Filter -->
+                    <div class="panel-card">
+                        <div class="table-toolbar">
+                            <div class="toolbar-filters">
+                                <label>Filter by Campus:</label>
+                                <select id="hostelCampusFilter" class="form-select-sm">
+                                    <option value="">All Campuses with Hostels</option>
+                                    <option value="1">Medical Campus</option>
+                                    <option value="2">Polytechnic Campus</option>
+                                    <option value="3">Diploma Campus</option>
+                                    <option value="4">Engineering Campus</option>
+                                    <option value="5">B.Tech Campus</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Room Cards Grid -->
+                        <div class="hostel-rooms-grid" id="hostelRoomsContainer">
+                            <!-- Loaded dynamically -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. EXCEL & CSV IMPORT PAGE -->
+                <section class="page-view" id="page-import">
+                    <div class="panel-card mb-4">
+                        <div class="import-hero-box">
+                            <div class="import-hero-info">
+                                <h3><i class="fa-solid fa-file-excel text-green"></i> Bulk Spreadsheet Importer</h3>
+                                <p>Import student records from Excel (<code>.xlsx</code>) or CSV files into the centralized SQLite database. Powered by Python Pandas with automated column validation, duplicate detection, and sequence ID generation.</p>
+                            </div>
+                            <div class="import-hero-action">
+                                <a href="/api/import/template" class="btn btn-outline-white" download>
+                                    <i class="fa-solid fa-download"></i> Download Sample Template
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="upload-dropzone" id="uploadDropzone">
+                            <input type="file" id="spreadsheetFileInput" accept=".csv, .xlsx, .xls" style="display: none;">
+                            <div class="dropzone-content" id="dropzoneClickArea">
+                                <i class="fa-solid fa-cloud-arrow-up dropzone-icon"></i>
+                                <h4>Drop your CSV or Excel file here, or <span class="text-primary cursor-pointer">browse</span></h4>
+                                <p>Supports .xlsx and .csv (Max 16 MB). Validates against the 6 official campus names.</p>
+                                <span class="filename-pill" id="selectedFilenamePill" style="display: none;"></span>
+                            </div>
+                            <div class="dropzone-actions mt-3" id="dropzoneActions" style="display: none;">
+                                <button class="btn btn-primary" id="startValidationBtn"><i class="fa-solid fa-shield-check"></i> Parse & Validate Spreadsheet</button>
+                                <button class="btn btn-outline" id="clearFileBtn"><i class="fa-solid fa-xmark"></i> Clear</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PREVIEW RESULTS -->
+                    <div class="panel-card" id="importPreviewPanel" style="display: none;">
+                        <div class="preview-header">
+                            <div>
+                                <h3>Import Validation Results</h3>
+                                <p id="previewSubtitle">Review valid and invalid records before committing to the database.</p>
+                            </div>
+                            <div class="preview-badges">
+                                <span class="badge-pill badge-green" id="validCountBadge">0 Valid Rows</span>
+                                <span class="badge-pill badge-red" id="invalidCountBadge">0 Invalid Rows</span>
+                                <button class="btn btn-primary" id="commitImportBtn" disabled>
+                                    <i class="fa-solid fa-database"></i> Commit Valid Records to SQLite
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Invalid Rows Warning Table -->
+                        <div id="invalidRowsContainer" style="display:none;" class="mb-4">
+                            <h4 class="text-danger mb-2"><i class="fa-solid fa-circle-exclamation"></i> Rows with Validation Errors (Will be skipped)</h4>
+                            <div class="table-responsive">
+                                <table class="data-table error-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Row #</th>
+                                            <th>Name</th>
+                                            <th>Campus</th>
+                                            <th>Email</th>
+                                            <th>Errors / Duplicate Reason</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="invalidRowsTbody">
+                                        <!-- Dynamic -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Valid Rows Preview Table -->
+                        <div id="validRowsContainer">
+                            <h4 class="text-success mb-2"><i class="fa-solid fa-circle-check"></i> Ready for Admission Import</h4>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Row #</th>
+                                            <th>Student Name</th>
+                                            <th>Campus</th>
+                                            <th>Course</th>
+                                            <th>Admission Year</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Fee</th>
+                                            <th>Concession</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="validRowsTbody">
+                                        <!-- Dynamic -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. CONSOLIDATED REPORTS PAGE -->
+                <section class="page-view" id="page-reports">
+                    <div class="panel-card mb-4">
+                        <div class="reports-header-row">
+                            <div>
+                                <h3>Institutional Reports & Analytics</h3>
+                                <p>Consolidated 6-campus institutional summaries, fee recovery, hostel audits, and compliance.</p>
+                            </div>
+                            <div class="report-export-btns">
+                                <button class="btn btn-outline" id="exportAllStudentsBtn"><i class="fa-solid fa-download"></i> All Students CSV</button>
+                                <button class="btn btn-outline" id="exportAllFeesBtn"><i class="fa-solid fa-download"></i> Financial Ledgers CSV</button>
+                                <button class="btn btn-outline" id="exportAllAttendanceBtn"><i class="fa-solid fa-download"></i> Attendance CSV</button>
+                                <button class="btn btn-primary" id="printReportBtn"><i class="fa-solid fa-print"></i> Print Report</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Consolidated Institutional Master Table -->
+                    <div class="panel-card mb-4">
+                        <div class="panel-header">
+                            <div class="panel-title-group">
+                                <h3>Six-Campus Institutional Master Summary</h3>
+                                <p>Central consolidated statistics calculated live from SQLite database</p>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table summary-table" id="consolidatedSummaryTable">
+                                <thead>
+                                    <tr>
+                                        <th>Campus</th>
+                                        <th>Code</th>
+                                        <th>Students</th>
+                                        <th>Total Assessed (₹)</th>
+                                        <th>Concessions (₹)</th>
+                                        <th>Total Collected (₹)</th>
+                                        <th>Pending (₹)</th>
+                                        <th>Collection %</th>
+                                        <th>Hostel Occ.</th>
+                                        <th>Avg Att. %</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="consolidatedSummaryTbody">
+                                    <!-- Dynamic -->
+                                </tbody>
+                                <tfoot id="consolidatedSummaryTfoot">
+                                    <!-- Grand totals -->
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Campus Comparison Visual Chart -->
+                    <div class="panel-card">
+                        <div class="card-title-row">
+                            <div>
+                                <h3>Campus Comparison: Fee Assessed vs Collected</h3>
+                                <p>Live institutional finance telemetry across all six campuses</p>
+                            </div>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 320px;">
+                            <canvas id="chartReportsComparison"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 8. SETTINGS & AUDIT PAGE -->
+                <section class="page-view" id="page-settings">
+                    <div class="panel-card mb-4">
+                        <div class="panel-header">
+                            <div class="panel-title-group">
+                                <h3>Institutional Configuration</h3>
+                                <p>Manage institutional thresholds, academic session, and campus defaults</p>
+                            </div>
+                            <button class="btn btn-primary" id="saveSettingsBtn"><i class="fa-solid fa-floppy-disk"></i> Save Settings</button>
+                        </div>
+                        <form id="settingsForm" class="settings-grid">
+                            <div class="form-group">
+                                <label class="form-label">Institution Display Name</label>
+                                <input type="text" id="settingInstName" class="form-input" value="Campus Sync — Central Multi-Campus Institute">
+                                <small class="form-hint">Displayed across institutional banners and PDF/CSV reports</small>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Attendance Alert Threshold (%)</label>
+                                <div class="input-with-addon">
+                                    <input type="number" id="settingAttendanceThreshold" class="form-input" min="50" max="100" value="75">
+                                    <span class="addon-text">%</span>
+                                </div>
+                                <small class="form-hint">Students falling below this percentage are highlighted in red and alerted</small>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Active Academic Year</label>
+                                <input type="text" id="settingAcademicYear" class="form-input" value="2025-2026" readonly>
+                                <small class="form-hint">Current academic session in operation</small>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Active Operator Role</label>
+                                <div class="role-selector-pill">
+                                    <span class="pill-active" id="currentActiveRolePill">Campus Supervisor</span>
+                                </div>
+                                <small class="form-hint">Switch between Administrator and Campus Supervisor via the bottom sidebar toggle</small>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- System Audit Trail -->
+                    <div class="panel-card">
+                        <div class="panel-header">
+                            <div class="panel-title-group">
+                                <h3><i class="fa-solid fa-clock-rotate-left"></i> Immutable Audit Trail</h3>
+                                <p>Detailed operational logs tracking every admission, fee payment, reversal, and transfer</p>
+                            </div>
+                            <div class="toolbar-filters">
+                                <select id="auditCampusFilter" class="form-select-sm">
+                                    <option value="">All Campuses</option>
+                                    <option value="Medical Campus">Medical Campus</option>
+                                    <option value="Polytechnic Campus">Polytechnic Campus</option>
+                                    <option value="Diploma Campus">Diploma Campus</option>
+                                    <option value="Engineering Campus">Engineering Campus</option>
+                                    <option value="B.Tech Campus">B.Tech Campus</option>
+                                    <option value="PUC Campus">PUC Campus</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table" id="auditTrailTable">
+                                <thead>
+                                    <tr>
+                                        <th>Log ID</th>
+                                        <th>Timestamp</th>
+                                        <th>User Role</th>
+                                        <th>Action Type</th>
+                                        <th>Campus</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auditTrailTbody">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- 1. NEW STUDENT ADMISSION MODAL -->
+    <div class="modal-overlay" id="modalStudentAdmission">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title"><i class="fa-solid fa-user-plus text-primary"></i> New Student Admission</h3>
+                    <p class="modal-subtitle">Enrolls student, generates campus-specific ID, and sets up fee profile.</p>
+                </div>
+                <button class="modal-close-btn" data-close="modalStudentAdmission"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="studentAdmissionForm">
+                <div class="modal-body">
+                    <!-- Duplicate Alert Banner inside Modal -->
+                    <div class="alert-box alert-warning" id="duplicateWarningBox" style="display: none;">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <div class="alert-content">
+                            <h5 id="dupAlertTitle">Possible Duplicate Detected</h5>
+                            <p id="dupAlertMsg">A student with this contact information already exists.</p>
+                            <label class="form-checkbox-label mt-1">
+                                <input type="checkbox" id="forceDuplicateCheck"> Proceed anyway (Force Admission)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label class="form-label required">First Name</label>
+                            <input type="text" id="admFirstName" class="form-input" placeholder="e.g. Aarav" required>
+                        </div>
+                        <div class="form-group flex-1">
+                            <label class="form-label required">Last Name</label>
+                            <input type="text" id="admLastName" class="form-input" placeholder="e.g. Sharma" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label class="form-label required">Campus</label>
+                            <select id="admCampusSelect" class="form-select" required>
+                                <option value="">-- Select One of Six Campuses --</option>
+                                <option value="1">1. Medical Campus (Prefix: MED)</option>
+                                <option value="2">2. Polytechnic Campus (Prefix: POLY)</option>
+                                <option value="3">3. Diploma Campus (Prefix: DIP)</option>
+                                <option value="4">4. Engineering Campus (Prefix: ENG)</option>
+                                <option value="5">5. B.Tech Campus (Prefix: BT)</option>
+                                <option value="6">6. PUC Campus (Prefix: PUC)</option>
+                            </select>
+                        </div>
+                        <div class="form-group flex-1">
+                            <label class="form-label required">Course / Specialization</label>
+                            <select id="admCourseSelect" class="form-select" required>
+                                <option value="">-- Select Course --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label class="form-label required">Email Address</label>
+                            <input type="email" id="admEmail" class="form-input" placeholder="student@institution.edu" required>
+                        </div>
+                        <div class="form-group flex-1">
+                            <label class="form-label required">Contact Phone</label>
+                            <input type="tel" id="admPhone" class="form-input" placeholder="10-digit mobile" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label class="form-label required">Admission Year</label>
+                            <input type="number" id="admYear" class="form-input" value="2025" min="2020" max="2030" required>
+                        </div>
+                        <div class="form-group flex-1">
+                            <label class="form-label">Gender</label>
+                            <select id="admGender" class="form-select">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label class="form-label required">Total Course Fee (₹)</label>
+                            <input type="number" id="admTotalFee" class="form-input" min="0" placeholder="e.g. 85000" required>
+                        </div>
+                        <div class="form-group flex-1">
+                            <label class="form-label">Scholarship / Concession (₹)</label>
+                            <input type="number" id="admConcession" class="form-input" min="0" value="0">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" data-close="modalStudentAdmission">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitAdmissionBtn">
+                        <i class="fa-solid fa-check"></i> Complete Admission
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. STUDENT DETAILS / PROFILE MODAL -->
+    <div class="modal-overlay" id="modalStudentProfile">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-header">
+                <div class="student-profile-header-meta">
+                    <div class="profile-avatar" id="profAvatar">AS</div>
+                    <div>
+                        <h3 class="modal-title" id="profStudentName">Aarav Sharma</h3>
+                        <div class="profile-sub-badges">
+                            <span class="badge-pill badge-primary" id="profStudentID">MED001</span>
+                            <span class="badge-pill badge-outline" id="profCampusName">Medical Campus</span>
+                            <span class="badge-pill badge-light" id="profCourse">MBBS</span>
+                            <span class="badge-pill badge-green" id="profStatus">Active</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="modal-close-btn" data-close="modalStudentProfile"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body profile-modal-body">
+                <!-- Profile Tabs -->
+                <div class="profile-tabs-header">
+                    <button class="prof-tab-btn active" data-tab="tab-overview">Overview & Finance</button>
+                    <button class="prof-tab-btn" data-tab="tab-payments">Payment History</button>
+                    <button class="prof-tab-btn" data-tab="tab-attendance">Attendance Record</button>
+                    <button class="prof-tab-btn" data-tab="tab-examinations">Examinations</button>
+                    <button class="prof-tab-btn" data-tab="tab-transfers">Campus Transfers</button>
+                </div>
+
+                <!-- Tab 1: Overview & Finance -->
+                <div class="prof-tab-content active" id="tab-overview">
+                    <div class="profile-info-grid">
+                        <div class="info-card">
+                            <h5>Contact Details</h5>
+                            <p><strong>Email:</strong> <span id="profEmail">aarav@med.edu</span></p>
+                            <p><strong>Phone:</strong> <span id="profPhone">9876543210</span></p>
+                            <p><strong>Gender:</strong> <span id="profGender">Male</span></p>
+                            <p><strong>Admission Year:</strong> <span id="profYear">2024</span></p>
+                        </div>
+                        <div class="info-card">
+                            <h5>Hostel Accommodation</h5>
+                            <p><strong>Status:</strong> <span id="profHostelStatus">Not Allotted</span></p>
+                            <p><strong>Room:</strong> <span id="profHostelRoom">--</span></p>
+                            <p><strong>Allotted Date:</strong> <span id="profHostelDate">--</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Fee Summary Box -->
+                    <div class="fee-overview-box mt-3">
+                        <div class="fee-ov-item">
+                            <span>Total Course Fee</span>
+                            <h4 id="profTotalFee">₹150,000</h4>
+                        </div>
+                        <div class="fee-ov-item">
+                            <span>Concession</span>
+                            <h4 id="profConcession" class="text-purple">₹15,000</h4>
+                        </div>
+                        <div class="fee-ov-item">
+                            <span>Amount Paid</span>
+                            <h4 id="profPaid" class="text-success">₹110,000</h4>
+                        </div>
+                        <div class="fee-ov-item">
+                            <span>Pending Balance</span>
+                            <h4 id="profPending" class="text-danger">₹25,000</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="prof-tab-content" id="tab-examinations">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>Subject</th><th>Code</th><th>Exam Date</th><th>Start</th><th>End</th><th>Type</th><th>Status</th></tr></thead>
+                            <tbody id="profExaminationsTbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Payments -->
+                <div class="prof-tab-content" id="tab-payments">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Receipt No</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Payment Mode</th>
+                                    <th>Type</th>
+                                    <th>Notes</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="profPaymentsTbody">
+                                <!-- Dynamic -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Attendance -->
+                <div class="prof-tab-content" id="tab-attendance">
+                    <div class="att-profile-summary mb-3">
+                        <span class="badge-pill badge-primary">Total Classes: <strong id="profAttTotal">0</strong></span>
+                        <span class="badge-pill badge-green">Present: <strong id="profAttPresent">0</strong></span>
+                        <span class="badge-pill badge-teal">Attendance Rate: <strong id="profAttRate">0%</strong></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Attendance Status</th>
+                                    <th>Logged By</th>
+                                </tr>
+                            </thead>
+                            <tbody id="profAttendanceTbody">
+                                <!-- Dynamic -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 4: Transfers -->
+                <div class="prof-tab-content" id="tab-transfers">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Transfer Date</th>
+                                    <th>From Campus</th>
+                                    <th>To Campus</th>
+                                    <th>Reason</th>
+                                    <th>Approved By</th>
+                                </tr>
+                            </thead>
+                            <tbody id="profTransfersTbody">
+                                <!-- Dynamic -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="profTransferBtn"><i class="fa-solid fa-arrow-right-arrow-left"></i> Transfer Campus</button>
+                <button class="btn btn-outline" id="profPayFeeBtn"><i class="fa-solid fa-receipt"></i> Pay Fees</button>
+                <button class="btn btn-secondary" data-close="modalStudentProfile">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. CAMPUS TRANSFER MODAL -->
+    <div class="modal-overlay" id="modalCampusTransfer">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title"><i class="fa-solid fa-arrow-right-arrow-left text-primary"></i> Campus Transfer</h3>
+                    <p class="modal-subtitle">Transfer student while preserving student ID, payments, and history.</p>
+                </div>
+                <button class="modal-close-btn" data-close="modalCampusTransfer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="campusTransferForm">
+                <div class="modal-body">
+                    <input type="hidden" id="transStudentId">
+                    <div class="transfer-info-banner">
+                        <strong id="transStudentName">Student Name</strong>
+                        <span id="transCurrentCampus">Current: Medical Campus</span>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label class="form-label required">Transfer To Campus</label>
+                        <select id="transToCampusSelect" class="form-select" required>
+                            <option value="">-- Select Destination Campus --</option>
+                            <option value="1">1. Medical Campus</option>
+                            <option value="2">2. Polytechnic Campus</option>
+                            <option value="3">3. Diploma Campus</option>
+                            <option value="4">4. Engineering Campus</option>
+                            <option value="5">5. B.Tech Campus</option>
+                            <option value="6">6. PUC Campus</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label class="form-label required">Reason for Transfer</label>
+                        <textarea id="transReason" class="form-input" rows="3" placeholder="Provide administrative justification for campus relocation..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" data-close="modalCampusTransfer">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="confirmTransferBtn">
+                        <i class="fa-solid fa-check"></i> Execute Transfer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. RECORD FEE PAYMENT MODAL -->
+    <div class="modal-overlay" id="modalRecordPayment">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title"><i class="fa-solid fa-receipt text-green"></i> Record Fee Payment</h3>
+                    <p class="modal-subtitle">Issues tamper-proof receipt and updates pending balance.</p>
+                </div>
+                <button class="modal-close-btn" data-close="modalRecordPayment"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="recordPaymentForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label required">Student ID or Name</label>
+                        <input type="text" id="payStudentId" class="form-input" placeholder="e.g. MED001" required>
+                        <small class="form-hint" id="payStudentHint">Type ID to auto-populate balance</small>
+                    </div>
+
+                    <div class="payment-balance-preview" id="payBalanceBox" style="display:none;">
+                        <span class="label">Outstanding Pending Balance:</span>
+                        <h4 id="payOutstandingLabel" class="text-danger">₹0</h4>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label class="form-label required">Payment Amount (₹)</label>
+                        <input type="number" id="payAmount" class="form-input" min="1" step="1" placeholder="Amount in Indian Rupees" required>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label class="form-label required">Payment Mode</label>
+                        <select id="payMode" class="form-select" required>
+                            <option value="UPI">UPI (Google Pay / PhonePe / Paytm)</option>
+                            <option value="Net Banking">Net Banking / NEFT / RTGS</option>
+                            <option value="Credit Card">Credit / Debit Card</option>
+                            <option value="Cash">Cash Receipt at Accounts Desk</option>
+                            <option value="Cheque">Bank Demand Draft / Cheque</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label class="form-label">Payment Date</label>
+                        <input type="date" id="payDate" class="form-input">
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label class="form-label">Transaction Notes / Reference</label>
+                        <input type="text" id="payNotes" class="form-input" placeholder="Bank ref, UTR number or remarks">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" data-close="modalRecordPayment">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitPaymentBtn">
+                        <i class="fa-solid fa-check"></i> Record Payment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 5. FEE REVERSAL MODAL -->
+    <div class="modal-overlay" id="modalFeeReversal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title"><i class="fa-solid fa-rotate-left text-danger"></i> Reverse Payment Receipt</h3>
+                    <p class="modal-subtitle">Creates an offsetting audit entry without destroying payment records.</p>
+                </div>
+                <button class="modal-close-btn" data-close="modalFeeReversal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="feeReversalForm">
+                <div class="modal-body">
+                    <input type="hidden" id="revReceiptNo">
+                    <div class="reversal-warning-box">
+                        <i class="fa-solid fa-circle-exclamation text-danger"></i>
+                        <div>
+                            <h5>You are reversing Receipt <span id="revReceiptDisplay">REC-XXXX</span></h5>
+                            <p>Original Amount: <strong id="revAmountDisplay">₹0</strong></p>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label class="form-label required">Mandatory Reason for Reversal</label>
+                        <textarea id="revReason" class="form-input" rows="3" placeholder="e.g. Bank chargeback, payment bounce, or administrative correction" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" data-close="modalFeeReversal">Cancel</button>
+                    <button type="submit" class="btn btn-danger" id="submitReversalBtn">
+                        <i class="fa-solid fa-check"></i> Confirm Reversal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 6. HOSTEL ALLOCATION MODAL -->
+    <div class="modal-overlay" id="modalHostelAllocate">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title"><i class="fa-solid fa-hotel text-primary"></i> Allocate Hostel Bed</h3>
+                    <p class="modal-subtitle">Allot vacant bed in campus residential blocks.</p>
+                </div>
+                <button class="modal-close-btn" data-close="modalHostelAllocate"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="hostelAllocateForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label required">Student ID</label>
+                        <input type="text" id="hostelStudentId" class="form-input" placeholder="e.g. ENG001" required>
+                        <small class="form-hint" id="hostelStudentLookupHint">Enter student ID to filter rooms by student's campus</small>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label class="form-label required">Available Room</label>
+                        <select id="hostelRoomSelect" class="form-select" required>
+                            <option value="">-- Select Available Room --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label class="form-label">Allotment Remarks</label>
+                        <input type="text" id="hostelRemarks" class="form-input" placeholder="Standard semester accommodation">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" data-close="modalHostelAllocate">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-check"></i> Confirm Allotment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 7. ADD HOSTEL ROOM MODAL -->
+    <div class="modal-overlay" id="modalAddHostelRoom">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title"><i class="fa-solid fa-plus text-primary"></i> Add Hostel Room</h3>
+                    <p class="modal-subtitle">Register new residential room in a campus hostel.</p>
+                </div>
+                <button class="modal-close-btn" data-close="modalAddHostelRoom"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="addHostelRoomForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label required">Campus</label>
+                        <select id="newRoomCampus" class="form-select" required>
+                            <option value="1">1. Medical Campus</option>
+                            <option value="2">2. Polytechnic Campus</option>
+                            <option value="3">3. Diploma Campus</option>
+                            <option value="4">4. Engineering Campus</option>
+                            <option value="5">5. B.Tech Campus</option>
+                        </select>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label class="form-label required">Room Number</label>
+                        <input type="text" id="newRoomNumber" class="form-input" placeholder="e.g. A-205" required>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label class="form-label required">Block Name</label>
+                        <input type="text" id="newRoomBlock" class="form-input" placeholder="e.g. Block B" value="Main Block" required>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label class="form-label required">Bed Capacity</label>
+                        <input type="number" id="newRoomCapacity" class="form-input" min="1" max="8" value="3" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" data-close="modalAddHostelRoom">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Room</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- App Script -->
+    <script src="/static/js/script.js"></script>
+</body>
+</html>
